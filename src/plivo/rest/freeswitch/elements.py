@@ -1424,7 +1424,10 @@ class Record(Element):
         timeout = self.extract_attribute_value("timeout")
         finish_on_key = self.extract_attribute_value("finishOnKey")
         self.file_path = self.extract_attribute_value("filePath")
-        if self.file_path:
+        # Cambiamos este IF para que verifique el path indicado a Plivo no sea en realidad una
+        # URL en el formato que recibe mod_http_cache para subir archivos a S3
+        # if self.file_path:
+        if self.file_path and not self.file_path.startswith("http_cache://"):
             self.file_path = os.path.normpath(self.file_path) + os.sep
         self.play_beep = self.extract_attribute_value("playBeep") == 'true'
         self.file_format = self.extract_attribute_value("fileFormat")
