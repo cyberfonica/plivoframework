@@ -370,10 +370,14 @@ class EventSocket(Commands):
         # and send it to eventsocket
         _cmd_uuid = str(uuid1())
         _async_res = gevent.event.AsyncResult()
+        if args:
+            command_to_send = "%s %s" % (command, args)
+        else:
+            command_to_send = command
         with self._lock:
             self._commands_pool.append((_cmd_uuid, _async_res))
-            self._send("%s %s" % (command, args))
-        self.trace("_protocol_send %s wait ..." % command)
+            self._send(command_to_send)
+        self.trace("_protocol_send %s wait ..." % command_to_send)
         _uuid, event = _async_res.get()
         if _cmd_uuid != _uuid:
             raise InternalSyncError("in _protocol_send")
