@@ -109,7 +109,9 @@ ELEMENTS_DEFAULT_PARAMS = {
                 'fileFormat': 'mp3',
                 'fileName': '',
                 'redirect': 'true',
-                'bothLegs': 'false'
+                'bothLegs': 'false',
+                'startOnDialAnswer': 'false',
+                'followTransfer': 'false'
         },
         'SIPTransfer': {
                 #url: SET IN ELEMENT BODY
@@ -834,7 +836,7 @@ class Dial(Element):
             outbound_socket.log.error("Dial Aborted, No Number to dial !")
             return
         # Create dialstring
-        self.dial_str = ','.join(numbers)
+        self.dial_str = ':_:'.join(numbers)
 
         # Set time limit: when reached, B Leg is hung up
         sched_hangup_id = str(uuid.uuid1())
@@ -863,7 +865,7 @@ class Dial(Element):
         self.dial_str = '<%s,%s%s>%s' % (ring_flag, dial_time_limit, dial_confirm, self.dial_str)
         # Ugly hack to force use of enterprise originate because simple originate lacks speak support in ringback
         if len(numbers) < 2:
-            self.dial_str += ','
+            self.dial_str += ':_:'
 
         # Set hangup on '*' or unset if not provided
         if self.hangup_on_star:
@@ -881,24 +883,20 @@ class Dial(Element):
                 play_str = "file_string://silence_stream://1!%s" % play_str
                 outbound_socket.set("bridge_early_media=false")
                 outbound_socket.set("instant_ringback=true")
-                outbound_socket.set("ignore_early_media=true")
                 outbound_socket.set("ringback=%s" % play_str)
             else:
                 self.dial_music = ''
         if not self.dial_music:
             outbound_socket.set("bridge_early_media=false")
             outbound_socket.set("instant_ringback=true")
-            outbound_socket.set("ignore_early_media=true")
             outbound_socket.set("ringback=${us-ring}")
         elif self.dial_music == "none":
             outbound_socket.set("bridge_early_media=false")
             outbound_socket.unset("instant_ringback")
-            outbound_socket.set("ignore_early_media=true")
             outbound_socket.unset("ringback")
         elif self.dial_music == "real":
             outbound_socket.set("bridge_early_media=true")
             outbound_socket.set("instant_ringback=false")
-            outbound_socket.set("ignore_early_media=true")
             outbound_socket.unset("ringback")
 
         # Start dial
@@ -938,16 +936,9 @@ class Dial(Element):
                 elif event['Event-Name'] == 'CHANNEL_BRIDGE':
                     outbound_socket.log.info("Dial bridged")
                 elif event['Event-Name'] == 'CHANNEL_UNBRIDGE':
-                    # La llamada original
-                    if 'variable_last_bridge_proto_specific_hangup_cause' not in event:
-                        outbound_socket.log.info("Dial unbridged as part of transfer. "
-                                                 "Keeping greenlet going")
-                        continue
-                    else:
-                        outbound_socket.log.info("Dial unbridged")
-                        break
-                elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE' \
-                        and event['variable_current_application'] == 'bridge':
+                    outbound_socket.log.info("Dial unbridged")
+                    break
+                elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE':
                     outbound_socket.log.info("Dial completed %s" % str(event))
                     break
 
@@ -1400,6 +1391,8 @@ class Record(Element):
     fileName: Default empty, if given this will be used for the recording
     bothLegs: record both legs (true/false, default false)
               no beep will be played
+    startOnDialAnswer: record call when called party answers in a Dial(true/false, default false).
+    followTransfer: call recording to continue after transferring (true/false, default false).
     redirect: if 'false', don't redirect to 'action', only request url
         and continue to next element. (default 'true')
     """
@@ -1414,6 +1407,8 @@ class Record(Element):
         self.file_format = ""
         self.filename = ""
         self.both_legs = False
+        self.start_on_dial_answer = False
+        self.recording_follow_transfer = False
         self.action = ''
         self.method = ''
         self.redirect = True
@@ -1424,10 +1419,7 @@ class Record(Element):
         timeout = self.extract_attribute_value("timeout")
         finish_on_key = self.extract_attribute_value("finishOnKey")
         self.file_path = self.extract_attribute_value("filePath")
-        # Cambiamos este IF para que verifique el path indicado a Plivo no sea en realidad una
-        # URL en el formato que recibe mod_http_cache para subir archivos a S3
-        # if self.file_path:
-        if self.file_path and not self.file_path.startswith("http_cache://"):
+        if self.file_path:
             self.file_path = os.path.normpath(self.file_path) + os.sep
         self.play_beep = self.extract_attribute_value("playBeep") == 'true'
         self.file_format = self.extract_attribute_value("fileFormat")
@@ -1435,6 +1427,8 @@ class Record(Element):
             raise RESTFormatException("Format must be 'wav' or 'mp3'")
         self.filename = self.extract_attribute_value("fileName")
         self.both_legs = self.extract_attribute_value("bothLegs") == 'true'
+        self.start_on_dial_answer = self.extract_attribute_value("startOnDialAnswer") == 'true'
+        self.recording_follow_transfer = self.extract_attribute_value("followTransfer") == 'true'
         self.redirect = self.extract_attribute_value("redirect") == 'true'
 
         self.action = self.extract_attribute_value("action")
@@ -1471,16 +1465,29 @@ class Record(Element):
         record_file = "%s%s.%s" % (self.file_path, filename, self.file_format)
 
         if self.both_legs:
+            # Verificamos si se quiere serguir grabando cuando se transfiere la llamada.
+            if self.recording_follow_transfer:
+                outbound_socket.set("recording_follow_transfer=true")
+                outbound_socket.log.info("Record Follow Transfer")
+
             outbound_socket.set("RECORD_STEREO=true")
-            outbound_socket.api("uuid_record %s start %s" \
-                                %  (outbound_socket.get_channel_unique_id(),
-                                   record_file)
-                               )
-            outbound_socket.api("sched_api +%s none uuid_record %s stop %s" \
-                                % (self.max_length,
-                                   outbound_socket.get_channel_unique_id(),
-                                   record_file)
-                               )
+            if self.start_on_dial_answer:
+                # En outbound_socket no disponemos de la aplicación 'export', por eso usamos 'set',
+                # para activar la grabación una vez sea contastada la llamada, hemos de exportar a
+                # al resto de patas 'execute_on_answer'.
+                outbound_socket.set("execute_on_answer=record_session %s" % record_file)
+                outbound_socket.set("export_vars=execute_on_answer")
+                outbound_socket.log.info("Record Execute On Answer")
+            else:
+                outbound_socket.api("uuid_record %s start %s" \
+                                    %  (outbound_socket.get_channel_unique_id(),
+                                       record_file)
+                                   )
+                outbound_socket.api("sched_api +%s none uuid_record %s stop %s" \
+                                    % (self.max_length,
+                                       outbound_socket.get_channel_unique_id(),
+                                       record_file)
+                                   )
             outbound_socket.log.info("Record Both Executed")
         else:
             if self.play_beep:
