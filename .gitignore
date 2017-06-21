@@ -7,3 +7,4 @@ docs/_build/*
 src/build*
 src/dist*
 src/*egg*
+.ropeproject/

@@ -109,7 +109,9 @@ ELEMENTS_DEFAULT_PARAMS = {
                 'fileFormat': 'mp3',
                 'fileName': '',
                 'redirect': 'true',
-                'bothLegs': 'false'
+                'bothLegs': 'false',
+                'startOnDialAnswer': 'false',
+                'followTransfer': 'false'
         },
         'SIPTransfer': {
                 #url: SET IN ELEMENT BODY
@@ -1400,6 +1402,8 @@ class Record(Element):
     fileName: Default empty, if given this will be used for the recording
     bothLegs: record both legs (true/false, default false)
               no beep will be played
+    startOnDialAnswer: record call when called party answers in a Dial(true/false, default false).
+    followTransfer: call recording to continue after transferring (true/false, default false).
     redirect: if 'false', don't redirect to 'action', only request url
         and continue to next element. (default 'true')
     """
@@ -1414,6 +1418,8 @@ class Record(Element):
         self.file_format = ""
         self.filename = ""
         self.both_legs = False
+        self.start_on_dial_answer = False
+        self.recording_follow_transfer = False
         self.action = ''
         self.method = ''
         self.redirect = True
@@ -1435,6 +1441,8 @@ class Record(Element):
             raise RESTFormatException("Format must be 'wav' or 'mp3'")
         self.filename = self.extract_attribute_value("fileName")
         self.both_legs = self.extract_attribute_value("bothLegs") == 'true'
+        self.start_on_dial_answer = self.extract_attribute_value("startOnDialAnswer") == 'true'
+        self.recording_follow_transfer = self.extract_attribute_value("followTransfer") == 'true'
         self.redirect = self.extract_attribute_value("redirect") == 'true'
 
         self.action = self.extract_attribute_value("action")
@@ -1471,16 +1479,29 @@ class Record(Element):
         record_file = "%s%s.%s" % (self.file_path, filename, self.file_format)
 
         if self.both_legs:
+            # Verificamos si se quiere serguir grabando cuando se transfiere la llamada.
+            if self.recording_follow_transfer:
+                outbound_socket.set("recording_follow_transfer=true")
+                outbound_socket.log.info("Record Follow Transfer")
+
             outbound_socket.set("RECORD_STEREO=true")
-            outbound_socket.api("uuid_record %s start %s" \
-                                %  (outbound_socket.get_channel_unique_id(),
-                                   record_file)
-                               )
-            outbound_socket.api("sched_api +%s none uuid_record %s stop %s" \
-                                % (self.max_length,
-                                   outbound_socket.get_channel_unique_id(),
-                                   record_file)
-                               )
+            if self.start_on_dial_answer:
+                # En outbound_socket no disponemos de la aplicación 'export', por eso usamos 'set',
+                # para activar la grabación una vez sea contastada la llamada, hemos de exportar a
+                # al resto de patas 'execute_on_answer'.
+                outbound_socket.set("execute_on_answer=record_session %s" % record_file)
+                outbound_socket.set("export_vars=execute_on_answer")
+                outbound_socket.log.info("Record Execute On Answer")
+            else:
+                outbound_socket.api("uuid_record %s start %s" \
+                                    %  (outbound_socket.get_channel_unique_id(),
+                                    record_file)
+                                )
+                outbound_socket.api("sched_api +%s none uuid_record %s stop %s" \
+                                    % (self.max_length,
+                                    outbound_socket.get_channel_unique_id(),
+                                    record_file)
+                                )
             outbound_socket.log.info("Record Both Executed")
         else:
             if self.play_beep:
