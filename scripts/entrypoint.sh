@@ -12,7 +12,7 @@ function replace_var() {
     nvar=$1
     val=$2
     file=$3
-    sed -i -r "s|^($nvar =).+|\1 $val|g" $file
+    sed -i -r "s|^#?($nvar =).+|\1 $val|g" $file
     echo "Updating plivoframework config VAR: $nvar -> $val"
 }
 
@@ -56,6 +56,30 @@ function replace_default_vars(){
     if [ "$TRACE" ]; then
         replace_var "TRACE" $TRACE /etc/plivo/default.conf
     fi
+
+    if [ "$WSGI_MODE" ]; then
+        replace_var "WSGI_MODE" $WSGI_MODE /etc/plivo/default.conf
+    fi
+
+    if [ "$SECRET_KEY" ]; then
+        replace_var "SECRET_KEY" $SECRET_KEY /etc/plivo/default.conf
+    fi
+
+    if [ "$HTTP_ADDRESS" ]; then
+        replace_var "HTTP_ADDRESS" $HTTP_ADDRESS /etc/plivo/default.conf
+    fi
+
+    if [ "$FS_INBOUND_ADDRESS" ]; then
+        replace_var "FS_INBOUND_ADDRESS" $FS_INBOUND_ADDRESS /etc/plivo/default.conf
+    fi
+
+    if [ "$FS_INBOUND_PASSWORD" ]; then
+        replace_var "FS_INBOUND_PASSWORD" $FS_INBOUND_PASSWORD /etc/plivo/default.conf
+    fi
+
+    if [ "$CALL_HEARTBEAT_URL" ]; then
+        replace_var "CALL_HEARTBEAT_URL" $CALL_HEARTBEAT_URL /etc/plivo/default.conf
+    fi
 }
 
 function replace_cache_vars(){
@@ -81,7 +105,7 @@ case $1 in
 
     "rest")
         replace_default_vars
-        echo "Not configured yet"
+        exec "/opt/plivo/src/plivo-rest" "-c" "/etc/plivo/default.conf"
         ;;
 
     "cache")
