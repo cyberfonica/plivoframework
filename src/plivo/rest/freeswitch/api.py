@@ -72,7 +72,7 @@ class CallRequest(object):
                 )
 
     def __init__(self, request_uuid, gateways,
-                 answer_url, ring_url, hangup_url, 
+                 answer_url, ring_url, hangup_url,
                  to='', _from='', accountsid='',
                  extra_dial_string=''):
         self.request_uuid = request_uuid
@@ -322,7 +322,7 @@ class PlivoRestApi(object):
                 gateway = Gateway(request_uuid, to, gw, codecs, timeout)
                 gateways.append(gateway)
 
-        call_req = CallRequest(request_uuid, gateways, answer_url, ring_url, hangup_url, 
+        call_req = CallRequest(request_uuid, gateways, answer_url, ring_url, hangup_url,
                                to=to, _from=caller_id, accountsid=accountsid,
                                extra_dial_string=args_str)
         return call_req
@@ -977,7 +977,7 @@ class PlivoRestApi(object):
                 msg = "RecordStart Failed: invalid TimeLimit '%s'" % str(timelimit)
                 return self.send_response(Success=result, Message=msg)
 
-        if filepath:
+        if filepath and not filepath.startswith("http_cache://"):
             filepath = os.path.normpath(filepath) + os.sep
         if not filename:
             filename = "%s_%s" % (datetime.now().strftime("%Y%m%d-%H%M%S"), calluuid)
@@ -1815,7 +1815,7 @@ class PlivoRestApi(object):
         loop = get_post_param(request, 'Loop') == 'true'
         mix = get_post_param(request, 'Mix')
         delimiter = get_post_param(request, 'Delimiter')
-        
+
         if mix == 'false':
             mix = False
         else:
@@ -1842,7 +1842,7 @@ class PlivoRestApi(object):
                 return self.send_response(Success=result, Message=msg)
 
         if not delimiter: delimiter = ','
-        
+
         sounds_list = sounds.split(delimiter)
         if not sounds_list:
             msg = "Sounds Parameter is Invalid"
