@@ -80,6 +80,10 @@ function replace_default_vars(){
     if [ "$CALL_HEARTBEAT_URL" ]; then
         replace_var "CALL_HEARTBEAT_URL" $CALL_HEARTBEAT_URL /etc/plivo/default.conf
     fi
+
+    if [ "$RECORD_URL" ]; then
+        replace_var "RECORD_URL" $RECORD_URL /etc/plivo/default.conf
+    fi
 }
 
 function replace_cache_vars(){
