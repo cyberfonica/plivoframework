@@ -818,6 +818,10 @@ class Dial(Element):
         # Don't hangup after bridge !
         outbound_socket.set("hangup_after_bridge=false")
 
+        outbound_socket.set("sip_h_X-Fs-Uuid=%s" % outbound_socket.get_channel_unique_id())
+        outbound_socket.set("sip_rh_X-Fs-Uuid=%s" % outbound_socket.get_channel_unique_id())
+        outbound_socket.set("sip_ph_X-Fs-Uuid=%s" % outbound_socket.get_channel_unique_id())
+
         # Set ring flag if dial will ring.
         # But first set plivo_dial_rang to false
         # to be sure we don't get it from an old Dial
