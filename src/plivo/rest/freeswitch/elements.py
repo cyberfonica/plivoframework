@@ -64,7 +64,8 @@ ELEMENTS_DEFAULT_PARAMS = {
                 'redirect': 'true',
                 'callbackUrl': '',
                 'callbackMethod': 'POST',
-                'digitsMatch': ''
+                'digitsMatch': '',
+                'recordCallPath': None
         },
         'GetDigits': {
                 #action: DYNAMIC! MUST BE SET IN METHOD,
@@ -608,6 +609,8 @@ class Dial(Element):
         and continue to next element. (default 'true')
     callbackUrl: url to request when bridge starts and bridge ends
     callbackMethod: submit to 'callbackUrl' url using GET or POST
+    recordCallPath: complete file path to save the file to (record call when called party answered)
+                    (default=None)
     """
     DEFAULT_TIMELIMIT = 14400
 
@@ -662,6 +665,7 @@ class Dial(Element):
         if not self.callback_method in ('GET', 'POST'):
             raise RESTAttributeException("callbackMethod must be 'GET' or 'POST'")
         self.digits_match = self.extract_attribute_value("digitsMatch")
+        self.record_call_path = self.extract_attribute_value("recordCallPath")
 
     def _prepare_play_string(self, outbound_socket, remote_url):
         sound_files = []
@@ -818,9 +822,10 @@ class Dial(Element):
         # Don't hangup after bridge !
         outbound_socket.set("hangup_after_bridge=false")
 
+        # Enviamos en la cabecera SIP INVITE y OK (de respuesta), el Call-UUID empleado por Freeswitch.
+        # Nota: Usado por el telefono web para ejecutar acciones en Plivo REST.
         outbound_socket.set("sip_h_X-Fs-Uuid=%s" % outbound_socket.get_channel_unique_id())
         outbound_socket.set("sip_rh_X-Fs-Uuid=%s" % outbound_socket.get_channel_unique_id())
-        outbound_socket.set("sip_ph_X-Fs-Uuid=%s" % outbound_socket.get_channel_unique_id())
 
         # Set ring flag if dial will ring.
         # But first set plivo_dial_rang to false
@@ -876,6 +881,21 @@ class Dial(Element):
             outbound_socket.set("bridge_terminate_key=*")
         else:
             outbound_socket.unset("bridge_terminate_key")
+
+        # Vemos si se quiere grabar la llamada de forma completa.
+        if self.record_call_path is not None:
+            outbound_socket.set("RECORD_STEREO=true")
+            # Generamos en nombre del fichero (forzamos a mp3).
+            record_file = "%s%s_%s.mp3" % (
+                self.record_call_path, datetime.now().strftime("%Y%m%d-%H%M%S"),
+                outbound_socket.get_channel_unique_id()
+            )
+            # En outbound_socket no disponemos de la aplicación 'export', por eso usamos 'set',
+            # para activar la grabación una vez sea contastada la llamada, hemos de exportar a
+            # al resto de patas 'execute_on_answer'.
+            outbound_socket.set("execute_on_answer=record_session %s" % record_file)
+            outbound_socket.set("export_vars=execute_on_answer")
+            outbound_socket.log.info("Record Execute On Answer")
 
         # Play Dial music or bridge the early media accordingly
         ringbacks = ''
