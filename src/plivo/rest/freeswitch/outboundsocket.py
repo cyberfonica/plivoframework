@@ -327,6 +327,7 @@ class PlivoOutboundEventSocket(OutboundEventSocket):
 
     def _run(self):
         self.connect()
+        self.log.info("Channel UUID: {}".format(self._uuid))
         self.resume()
         # Linger to get all remaining events before closing
         self.linger()
