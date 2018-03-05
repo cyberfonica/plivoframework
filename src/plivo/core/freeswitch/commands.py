@@ -96,30 +96,30 @@ class Commands(object):
         filter() is used, just the filtered events will come to the app - this is where this
         function differs from event().
 
-        >>> filter('Event-Name MYEVENT')
-        >>> filter('Unique-ID 4f37c5eb-1937-45c6-b808-6fba2ffadb63')
+        #> filter('Event-Name MYEVENT')
+        #> filter('Unique-ID 4f37c5eb-1937-45c6-b808-6fba2ffadb63')
         """
         return self._protocol_send('filter', args)
 
     def filter_delete(self, args):
         """Please refer to http://wiki.freeswitch.org/wiki/Event_Socket#filter_delete
 
-        >>> filter_delete('Event-Name MYEVENT')
+        #> filter_delete('Event-Name MYEVENT')
         """
         return self._protocol_send('filter delete', args)
 
     def divert_events(self, flag):
         """Please refer to http://wiki.freeswitch.org/wiki/Event_Socket#divert_events
 
-        >>> divert_events("off")
-        >>> divert_events("on")
+        #> divert_events("off")
+        #> divert_events("on")
         """
         return self._protocol_send('divert_events', flag)
 
     def sendevent(self, args):
         """Please refer to http://wiki.freeswitch.org/wiki/Event_Socket#sendevent
 
-        >>> sendevent("CUSTOM\nEvent-Name: CUSTOM\nEvent-Subclass: myevent::test\n")
+        #> sendevent("CUSTOM\nEvent-Name: CUSTOM\nEvent-Subclass: myevent::test\n")
 
         This example will send event :
           Event-Subclass: myevent%3A%3Atest
@@ -140,7 +140,7 @@ class Commands(object):
 
         For Outbound connection, please refer to http://wiki.freeswitch.org/wiki/Event_Socket_Outbound#Events
 
-        >>> myevents()
+        #> myevents()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -154,7 +154,7 @@ class Commands(object):
 
         Can only be used with Outbound connection.
 
-        >>> linger()
+        #> linger()
 
         """
         return self._protocol_send("linger")
@@ -162,7 +162,7 @@ class Commands(object):
     def verbose_events(self, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_verbose_events
 
-        >>> verbose_events()
+        #> verbose_events()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -172,7 +172,7 @@ class Commands(object):
         """
         Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_answer
 
-        >>> answer()
+        #> answer()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -182,7 +182,7 @@ class Commands(object):
         """
         Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_bridge
 
-        >>> bridge("{ignore_early_media=true}sofia/gateway/myGW/177808")
+        #> bridge("{ignore_early_media=true}sofia/gateway/myGW/177808")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -193,7 +193,7 @@ class Commands(object):
 
         Hangup `cause` list : http://wiki.freeswitch.org/wiki/Hangup_Causes (Enumeration column)
 
-        >>> hangup()
+        #> hangup()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -202,7 +202,7 @@ class Commands(object):
     def ring_ready(self, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_ring_ready
 
-        >>> ring_ready()
+        #> ring_ready()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -211,7 +211,7 @@ class Commands(object):
     def record_session(self, filename, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_record_session
 
-        >>> record_session("/tmp/dump.gsm")
+        #> record_session("/tmp/dump.gsm")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -220,7 +220,7 @@ class Commands(object):
     def bind_meta_app(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_bind_meta_app
 
-        >>> bind_meta_app("2 ab s record_session::/tmp/dump.gsm")
+        #> bind_meta_app("2 ab s record_session::/tmp/dump.gsm")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -229,7 +229,7 @@ class Commands(object):
     def bind_digit_action(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_bind_digit_action
 
-        >>> bind_digit_action("test1,456,exec:playback,ivr/ivr-welcome_to_freeswitch.wav")
+        #> bind_digit_action("test1,456,exec:playback,ivr/ivr-welcome_to_freeswitch.wav")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -238,7 +238,7 @@ class Commands(object):
     def digit_action_set_realm(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_digit_action_set_realm
 
-        >>> digit_action_set_realm("test1")
+        #> digit_action_set_realm("test1")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -246,7 +246,7 @@ class Commands(object):
 
     def clear_digit_action(self, args, uuid="", lock=True):
         """
-        >>> clear_digit_action("test1")
+        #> clear_digit_action("test1")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -255,7 +255,7 @@ class Commands(object):
     def wait_for_silence(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_wait_for_silence
 
-        >>> wait_for_silence("200 15 10 5000")
+        #> wait_for_silence("200 15 10 5000")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -264,8 +264,8 @@ class Commands(object):
     def sleep(self, milliseconds, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_sleep
 
-        >>> sleep(5000)
-        >>> sleep("5000")
+        #> sleep(5000)
+        #> sleep("5000")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -274,8 +274,8 @@ class Commands(object):
     def vmd(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Mod_vmd
 
-        >>> vmd("start")
-        >>> vmd("stop")
+        #> vmd("start")
+        #> vmd("stop")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -284,7 +284,7 @@ class Commands(object):
     def set(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_set
 
-        >>> set("ringback=${us-ring}")
+        #> set("ringback=${us-ring}")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -293,7 +293,7 @@ class Commands(object):
     def set_global(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_set_global
 
-        >>> set_global("global_var=value")
+        #> set_global("global_var=value")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -302,7 +302,7 @@ class Commands(object):
     def unset(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_unset
 
-        >>> unset("ringback")
+        #> unset("ringback")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -311,7 +311,7 @@ class Commands(object):
     def start_dtmf(self, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_start_dtmf
 
-        >>> start_dtmf()
+        #> start_dtmf()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -320,7 +320,7 @@ class Commands(object):
     def stop_dtmf(self, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_stop_dtmf
 
-        >>> stop_dtmf()
+        #> stop_dtmf()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -329,7 +329,7 @@ class Commands(object):
     def start_dtmf_generate(self, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_start_dtmf_generate
 
-        >>> start_dtmf_generate()
+        #> start_dtmf_generate()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -338,7 +338,7 @@ class Commands(object):
     def stop_dtmf_generate(self, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_stop_dtmf_generate
 
-        >>> stop_dtmf_generate()
+        #> stop_dtmf_generate()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -349,7 +349,7 @@ class Commands(object):
 
         Enqueue each received dtmf, that'll be sent once the call is bridged.
 
-        >>> queue_dtmf("0123456789")
+        #> queue_dtmf("0123456789")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -358,7 +358,7 @@ class Commands(object):
     def flush_dtmf(self, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_flush_dtmf
 
-        >>> flush_dtmf()
+        #> flush_dtmf()
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -367,7 +367,7 @@ class Commands(object):
     def play_fsv(self, filename, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Mod_fsv
 
-        >>> play_fsv("/tmp/video.fsv")
+        #> play_fsv("/tmp/video.fsv")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -376,7 +376,7 @@ class Commands(object):
     def record_fsv(self, filename, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Mod_fsv
 
-        >>> record_fsv("/tmp/video.fsv")
+        #> record_fsv("/tmp/video.fsv")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -388,7 +388,7 @@ class Commands(object):
         The optional argument `terminators` may contain a string with
         the characters that will terminate the playback.
 
-        >>> playback("/tmp/dump.gsm", terminators="#8")
+        #> playback("/tmp/dump.gsm", terminators="#8")
 
         In this case, the audio playback is automatically terminated
         by pressing either '#' or '8'.
@@ -402,7 +402,7 @@ class Commands(object):
     def transfer(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_transfer
 
-        >>> transfer("3222 XML default")
+        #> transfer("3222 XML default")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -411,7 +411,7 @@ class Commands(object):
     def att_xfer(self, url, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_att_xfer
 
-        >>> att_xfer("user/1001")
+        #> att_xfer("user/1001")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -420,7 +420,7 @@ class Commands(object):
     def endless_playback(self, filename, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_endless_playback
 
-        >>> endless_playback("/tmp/dump.gsm")
+        #> endless_playback("/tmp/dump.gsm")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -488,7 +488,7 @@ class Commands(object):
     def conference(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Mod_conference
 
-        >>> conference(args)
+        #> conference(args)
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -497,9 +497,9 @@ class Commands(object):
     def speak(self, text, uuid="", lock=True, loops=1):
         """Please refer to http://wiki.freeswitch.org/wiki/TTS
 
-        >>> "set" data="tts_engine=flite"
-        >>> "set" data="tts_voice=kal"
-        >>> speak(text)
+        #> "set" data="tts_engine=flite"
+        #> "set" data="tts_voice=kal"
+        #> speak(text)
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -512,7 +512,7 @@ class Commands(object):
     def say(self, args, uuid="", lock=True, loops=1):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_say
 
-        >>> say(en number pronounced 12345)
+        #> say(en number pronounced 12345)
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -521,7 +521,7 @@ class Commands(object):
     def sched_hangup(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_sched_hangup
 
-        >>> sched_hangup("+60 ALLOTTED_TIMEOUT")
+        #> sched_hangup("+60 ALLOTTED_TIMEOUT")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -530,7 +530,7 @@ class Commands(object):
     def sched_transfer(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_sched_transfer
 
-        >>> sched_transfer("+60 9999 XML default")
+        #> sched_transfer("+60 9999 XML default")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -540,7 +540,7 @@ class Commands(object):
         """
         Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_redirect
 
-        >>> redirect("sip:foo@bar.com")
+        #> redirect("sip:foo@bar.com")
 
         For Inbound connection, uuid argument is mandatory.
         """
@@ -550,7 +550,7 @@ class Commands(object):
         """
         Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_deflect
 
-        >>> deflect("sip:foo@bar.com")
+        #> deflect("sip:foo@bar.com")
 
         For Inbound connection, uuid argument is mandatory.
         """
