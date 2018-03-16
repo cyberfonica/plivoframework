@@ -9,6 +9,33 @@ a wide variety of applications(IVRs, Billing System, Voicemail, Click to Call et
 in a simple and extensible manner, using any web language you know.
 
 
+Como ejecutar localmente en un virtualenv
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Este paquete tiene algunos requerimientos especificos, el mas complicado de satisfacer es que es
+incompatible con versiones recientes de python 2.7. En el entorno de produccion se usa python 2.7.6
+y esa es la version recomendada para ejecutar en local. La manera en que me parece que interfiere
+menos con el sistema operativo nativo es la siguiente:
+
+1.- Instalamos python desde sources en una carpeta fuera de las naturales del SO:
+
+wget  https://www.python.org/ftp/python/2.7.6/Python-2.7.6.tgz
+./configure
+make
+make altinstall prefix=~/python2.7.6
+
+Luego, al crear el virtualenv referenciaremos este binario de python que acabamos de compilar:
+
+mkvirtualenv -p ~/python2.7.6/bin/python2.7 <<nombre del virtualenv>>
+
+Una vez dentro del virtualenv, instalamos los requerimientos:
+
+pip install -r requirements.txt
+
+Y podremos ejecutar, por ejemplo el servidor outbound mediante el siguiente comando:
+
+python src/plivo-outbound -c <<PATH AL FICHERO DE CONFIGURACION>>
+
 Documentation
 ~~~~~~~~~~~~~~
 
