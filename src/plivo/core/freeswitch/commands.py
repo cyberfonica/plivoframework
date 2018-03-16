@@ -574,3 +574,11 @@ class Commands(object):
 
         args = "{} {} {} {} {}".format(fifo_name, verb, wait_arg, announce_arg, music_arg).strip()
         return self._protocol_sendmsg("fifo", args, uuid, lock)
+
+    def callcenter(self, queue_name, uuid="", lock=True):
+        """
+        Please refer to https://freeswitch.org/confluence/display/FREESWITCH/mod_callcenter
+
+        For Inbound connection, uuid argument is mandatory.
+        """
+        return self._protocol_sendmsg("callcenter", queue_name, uuid, lock)

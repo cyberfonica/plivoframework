@@ -150,8 +150,13 @@ ELEMENTS_DEFAULT_PARAMS = {
                 'announce_file': '',
                 'music_file': '',
                 'wait': False,
-                'action': '',
                 'redirect': True,
+        },
+        'Callcenter': {
+            # action: DYNAMIC! MUST BE SET IN METHOD,
+            'method': 'POST',
+            # 'queue_name': DYNAMIC! MUST BE SET IN METHOD,
+            'redirect': True,
         },
     }
 
@@ -2108,6 +2113,70 @@ class Fifo(Element):
                 #         break
                 elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE':
                     outbound_socket.log.info("Fifo completed %s" % str(event))
+                    break
+                else:
+                    outbound_socket.log.debug("Event Name: {}".format(event['Event-Name']))
+                    continue
+
+        finally:
+            # If action is set, redirect to this url
+            # Otherwise, continue to next Element
+            if self.action and is_valid_url(self.action):
+                outbound_socket.log.info("I DONT KNOW WHAT TO DO!")
+                # params = {}
+                # if dial_rang:
+                #     params['DialRingStatus'] = 'true'
+                # else:
+                #     params['DialRingStatus'] = 'false'
+                # params['DialHangupCause'] = hangup_cause
+                # params['DialALegUUID'] = outbound_socket.get_channel_unique_id()
+                # if bleg_uuid:
+                #     params['DialBLegUUID'] = bleg_uuid
+                # else:
+                #     params['DialBLegUUID'] = ''
+                # if self.redirect:
+                #     self.fetch_rest_xml(self.action, params, method=self.method)
+                # else:
+                #     spawn_raw(outbound_socket.send_to_url, self.action, params, method=self.method)
+
+
+class Callcenter(Element):
+
+    def __init__(self):
+        Element.__init__(self)
+        self.queue_name = None
+        self.action = None
+        self.redirect = False
+
+    def parse_element(self, element, uri=None):
+        Element.parse_element(self, element, uri)
+        # Extract Loop attribute
+        self.queue_name = self.extract_attribute_value("queue_name")
+        self.action = self.extract_attribute_value('action')
+        self.redirect = self.extract_attribute_value("redirect") == 'true'
+
+    def execute(self, outbound_socket):
+        outbound_socket.log.info("Callcenter: Queue: {}".format(self.queue_name))
+        try:
+            outbound_socket.callcenter(self.queue_name)
+            # waiting event
+            for x in range(10000):
+                event = outbound_socket.wait_for_action(timeout=30, raise_on_hangup=True)
+                if event.is_empty():
+                    continue
+                # elif event['Event-Name'] == 'CHANNEL_BRIDGE':
+                #     outbound_socket.log.info("Dial bridged")
+                # elif event['Event-Name'] == 'CHANNEL_UNBRIDGE':
+                #     # La llamada original
+                #     if 'variable_last_bridge_proto_specific_hangup_cause' not in event:
+                #         outbound_socket.log.info("Dial unbridged as part of transfer. "
+                #                                  "Keeping greenlet going")
+                #         continue
+                #     else:
+                #         outbound_socket.log.info("Dial unbridged")
+                #         break
+                elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE':
+                    outbound_socket.log.info("Callcenter completed %s" % str(event))
                     break
                 else:
                     outbound_socket.log.debug("Event Name: {}".format(event['Event-Name']))
