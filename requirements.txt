@@ -1,0 +1,4 @@
+Flask==0.12.2
+ujson==1.35
+redis==2.10.6
+https://github.com/gevent/gevent/archive/1.0a3.tar.gz
