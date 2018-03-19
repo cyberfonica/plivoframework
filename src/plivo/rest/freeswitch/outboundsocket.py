@@ -668,6 +668,9 @@ class PlivoOutboundEventSocket(OutboundEventSocket):
 
         # If transfer is in progress, don't hangup call
         if not self.has_hangup():
+            # proto_specific_hangup_cause = self.get_var('variable_last_bridge_proto_specific_hangup_cause')
+            # self.log.debug(" Call was hungup: PROTO SPECIFIC HANGUP CAUSE: {}".format(proto_specific_hangup_cause))
+            # xfer_progress = self.get_var('plivo_transfer_progress') == 'true' or proto_specific_hangup_cause is None
             xfer_progress = self.get_var('plivo_transfer_progress') == 'true'
             if not xfer_progress:
                 self.log.info('No more Elements, Hangup Now !')
