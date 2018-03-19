@@ -556,24 +556,6 @@ class Commands(object):
         """
         return self._protocol_sendmsg("deflect", args, uuid, lock)
 
-    def fifo(self, fifo_name, verb, announce_file, music_file, wait, uuid="", lock=True):
-        """
-        Please refer to https://freeswitch.org/confluence/display/FREESWITCH/mod_fifo#mod_fifo-DialplanExample
-
-        For Inbound connection, uuid argument is mandatory.
-        """
-        wait_arg = ""
-        if verb == 'out':
-            if wait:
-                wait_arg = "wait"
-            else:
-                wait_arg = "nowait"
-
-        announce_arg = announce_file if announce_file else "undef"
-        music_arg = music_file if music_file else "undef"
-
-        args = "{} {} {} {} {}".format(fifo_name, verb, wait_arg, announce_arg, music_arg).strip()
-        return self._protocol_sendmsg("fifo", args, uuid, lock)
 
     def callcenter(self, queue_name, uuid="", lock=True):
         """
