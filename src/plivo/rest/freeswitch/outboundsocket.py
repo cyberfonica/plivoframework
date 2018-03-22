@@ -76,6 +76,7 @@ class PlivoOutboundEventSocket(OutboundEventSocket):
                         'speak',
                         'conference',
                         'park',
+                        'callcenter',
                        )
     NO_ANSWER_ELEMENTS = ('Wait',
                           'PreAnswer',
@@ -83,6 +84,10 @@ class PlivoOutboundEventSocket(OutboundEventSocket):
                           'Dial',
                           'Notify',
                          )
+
+    BRIDGE_AWARE_ELEMENTS = ('Dial',
+                             'Callcenter',
+                            )
 
     def __init__(self, socket, address,
                  log, cache,

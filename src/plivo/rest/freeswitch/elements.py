@@ -2076,81 +2076,21 @@ class Callcenter(Element):
 
     def execute(self, outbound_socket):
         outbound_socket.log.info("Callcenter: Queue: {}".format(self.queue_name))
-        dial_rang = ''
-        hangup_cause = ''
-        bleg_uuid = ''
-        try:
-            outbound_socket.callcenter(self.queue_name)
-            # waiting event
-            for x in range(10000):
-                event = outbound_socket.wait_for_action(timeout=30, raise_on_hangup=True)
-                if event.is_empty():
-                    continue
-                elif event['Event-Name'] == 'CHANNEL_BRIDGE':
-                    outbound_socket.log.info("Dial bridged")
-                elif event['Event-Name'] == 'CHANNEL_UNBRIDGE':
-                    # La llamada original
-                    if 'variable_last_bridge_proto_specific_hangup_cause' not in event:
-                        outbound_socket.log.info("Dial unbridged as part of transfer. "
-                                                 "Keeping greenlet going")
-                        continue
-                    else:
-                        outbound_socket.log.info("Dial unbridged")
-                        break
-                elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE':
-                    outbound_socket.log.info("Callcenter completed %s" % str(event))
-                    break
-                else:
-                    outbound_socket.log.debug("Event Name: {}".format(event['Event-Name']))
-                    continue
-
-            # parse received events
-            if event['Event-Name'] == 'CHANNEL_UNBRIDGE':
-                bleg_uuid = event['variable_bridge_uuid'] or ''
-                event = outbound_socket.wait_for_action(timeout=30, raise_on_hangup=True)
-
-            originate_disposition = event['variable_originate_disposition']
-            hangup_cause = originate_disposition
-            if hangup_cause == 'ORIGINATOR_CANCEL':
-                reason = '%s (A leg)' % hangup_cause
+        outbound_socket.callcenter(self.queue_name)
+        # waiting event
+        for x in range(10000):
+            event = outbound_socket.wait_for_action(timeout=30, raise_on_hangup=True)
+            if event.is_empty():
+                continue
+            elif event['Event-Name'] == 'CHANNEL_BRIDGE':
+                outbound_socket.log.info("Callcenter channel bridged")
+                continue
+            elif event['Event-Name'] == 'CHANNEL_UNBRIDGE':
+                outbound_socket.log.info("Callcenter channel unbridged")
+                continue
+            elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE':
+                outbound_socket.log.info("Callcenter completed %s" % str(event))
+                continue
             else:
-                reason = '%s (B leg)' % hangup_cause
-            if not hangup_cause or hangup_cause == 'SUCCESS':
-                hangup_cause = outbound_socket.get_hangup_cause()
-                reason = '%s (A leg)' % hangup_cause
-                if not hangup_cause:
-                    hangup_cause = outbound_socket.get_var('bridge_hangup_cause')
-                    reason = '%s (B leg)' % hangup_cause
-                    if not hangup_cause:
-                        hangup_cause = outbound_socket.get_var('hangup_cause')
-                        reason = '%s (A leg)' % hangup_cause
-                        if not hangup_cause:
-                            hangup_cause = 'NORMAL_CLEARING'
-                            reason = '%s (A leg)' % hangup_cause
-            outbound_socket.log.info("Dial Finished with reason: %s" \
-                                     % reason)
-
-            # Get ring status
-            dial_rang = outbound_socket.get_var("plivo_dial_rang") == 'true'
-
-        finally:
-            # If action is set, redirect to this url
-            # Otherwise, continue to next Element
-            if self.action and is_valid_url(self.action):
-                outbound_socket.log.info("I DONT KNOW WHAT TO DO!")
-
-                params = {}
-                if dial_rang:
-                    params['DialRingStatus'] = 'true'
-                else:
-                    params['DialRingStatus'] = 'false'
-                params['DialHangupCause'] = hangup_cause
-                params['DialALegUUID'] = outbound_socket.get_channel_unique_id()
-                if bleg_uuid:
-                    params['DialBLegUUID'] = bleg_uuid
-                else:
-                    params['DialBLegUUID'] = ''
-                if self.redirect:
-                    self.fetch_rest_xml(self.action, params, method=self.method)
-                else:
-                    spawn_raw(outbound_socket.send_to_url, self.action, params, method=self.method)
+                outbound_socket.log.debug("Event Name: {}".format(event['Event-Name']))
+                continue
