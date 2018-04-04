@@ -82,4 +82,6 @@ URLS = {
         '/' + PLIVO_VERSION + '/ConferenceListMembers/': (PlivoRestApi.conference_list_members, ['POST']),
         # API to list all conferences with members
         '/' + PLIVO_VERSION + '/ConferenceList/': (PlivoRestApi.conference_list, ['POST']),
+        # API change a callcenter agent's status
+        '/' + PLIVO_VERSION + '/CallcenterConfigAgent/': (PlivoRestApi.test_agent_config, ['POST']),
        }

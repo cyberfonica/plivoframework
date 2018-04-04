@@ -2228,3 +2228,9 @@ class PlivoRestApi(object):
         result = True
         return self.send_response(Success=result, Message=msg)
 
+    @auth_protect
+    def test_agent_config(self):
+        self._rest_inbound_socket.callcenter_config_agent('fran_web', 'status', 'Available')
+        msg = "SendDigits executed"
+        result = True
+        return self.send_response(Success=result, Message=msg)

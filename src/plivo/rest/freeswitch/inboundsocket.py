@@ -1008,6 +1008,12 @@ class RESTInboundSocket(InboundEventSocket):
             return False
         return True
 
+    def callcenter_config_agent(self, agent_name, key, value):
+        self.log.info("executing mod_callcenter config agent: name: {}, key: {}, value: {}".format(agent_name, key, value))
+        response = self.api("callcenter_config agent set {} {} {}".format(key, agent_name, value))
+        self.log.info("executed mod_callcenter config agent. Response: {}".format(response))
+        return True
+
     def _get_displace_media_list(self, uuid=''):
         if not uuid:
             return []
