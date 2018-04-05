@@ -7,6 +7,9 @@ import uuid
 import os
 import os.path
 from datetime import datetime
+
+from plivo.rest.freeswitch import callcenter_constants
+
 try:
     import xml.etree.cElementTree as etree
 except ImportError:
@@ -2229,8 +2232,43 @@ class PlivoRestApi(object):
         return self.send_response(Success=result, Message=msg)
 
     @auth_protect
-    def test_agent_config(self):
-        self._rest_inbound_socket.callcenter_config_agent('fran_web', 'status', 'Available')
-        msg = "SendDigits executed"
+    def callcenter_set_agent_status(self):
+        agent_name = get_post_param(request, 'agent_name')
+        status = get_post_param(request, 'status')
+        if status == 'available':
+            api_status = callcenter_constants.AGENT_STATUS_AVAILABLE
+        elif status == 'logged_out':
+            api_status = callcenter_constants.AGENT_STATUS_LOGGED_OUT
+        else:
+            msg = "Invalid status received: {}".format(status)
+            result = False
+            return self.send_response(Success=result, Message=msg)
+
+        if self._rest_inbound_socket.callcenter_config_agent(agent_name, 'status', api_status):
+            msg = "callcenter set agent status executed"
+            result = True
+        else:
+            msg = "callcenter set agent status failed to execute"
+            result = False
+        return self.send_response(Success=result, Message=msg)
+
+    @auth_protect
+    def testurl(self):
+        # agent_name = get_post_param(request, 'agent_name')
+        response = self._rest_inbound_socket.callcenter_remove_all_tiers_from_queue("1:=:28:=:soporte")
+        self._rest_inbound_socket.log.info("resut: {}".format(response))
+        response = self._rest_inbound_socket.callcenter_reload_queue("1:=:28:=:soporte")
+        self._rest_inbound_socket.log.info("resut: {}".format(response))
+        # lines = response._raw_body.split('\n')
+        # if len(lines)
+        # if lines[0] == '+OK':
+            #no tiers in this queue
+            # pass
+        # else:
+        #     for raw_tier in lines[1:-2]:
+        #         match = re.match(r'^(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)$', raw_tier)
+        #         queue_name = match.group(1)
+        #         agent_name = match.group(2)
         result = True
+        msg = "Executed"
         return self.send_response(Success=result, Message=msg)

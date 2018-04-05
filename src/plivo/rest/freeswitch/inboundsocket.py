@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) 2011 Plivo Team. See LICENSE for details.
+import re
 
 from gevent import monkey
 monkey.patch_all()
@@ -1010,9 +1011,32 @@ class RESTInboundSocket(InboundEventSocket):
 
     def callcenter_config_agent(self, agent_name, key, value):
         self.log.info("executing mod_callcenter config agent: name: {}, key: {}, value: {}".format(agent_name, key, value))
-        response = self.api("callcenter_config agent set {} {} {}".format(key, agent_name, value))
+        response = self.api("callcenter_config agent set {} {} '{}'".format(key, agent_name, value))
         self.log.info("executed mod_callcenter config agent. Response: {}".format(response))
+        if response._raw_body.startswith('-ERR'):
+            self.log.error("mod_callcenter config agent failed: {}".format(response._raw_body))
+            return False
         return True
+
+    def callcenter_remove_all_tiers_from_queue(self, queue_name):
+        response = self.api("callcenter_config queue list tiers {}".format(queue_name))
+        lines = response._raw_body.split('\n')
+
+        if lines[0] == '+OK':
+            #no tiers in this queue
+            pass
+        else:
+            for raw_tier in lines[1:-2]:
+                match = re.match(r'^(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)$', raw_tier)
+                queue_name = match.group(1)
+                agent_name = match.group(2)
+                del_response = self.api("callcenter_config tier del {} {}".format(queue_name, agent_name))
+        return True
+
+    def callcenter_reload_queue(self, queue_name):
+        response = self.api("callcenter_config queue reload {}".format(queue_name))
+        lines = response._raw_body.split('\n')
+        return lines[0] == '+OK'
 
     def _get_displace_media_list(self, uuid=''):
         if not uuid:
