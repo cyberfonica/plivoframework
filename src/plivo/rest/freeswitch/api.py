@@ -2239,6 +2239,10 @@ class PlivoRestApi(object):
             api_status = callcenter_constants.AGENT_STATUS_AVAILABLE
         elif status == 'logged_out':
             api_status = callcenter_constants.AGENT_STATUS_LOGGED_OUT
+        elif status == 'on_demand':
+            api_status = callcenter_constants.AGENT_STATUS_AVAILABLE_ON_DEMAND
+        elif status == 'on_break':
+            api_status = callcenter_constants.AGENT_STATUS_ON_BREAK
         else:
             msg = "Invalid status received: {}".format(status)
             result = False
@@ -2253,11 +2257,34 @@ class PlivoRestApi(object):
         return self.send_response(Success=result, Message=msg)
 
     @auth_protect
+    def callcenter_deep_reload_queue(self):
+        """
+        deep reload means that it will remove all of the queue's tiers before reloading
+        the config
+        """
+        result = False
+        queue_name = get_post_param(request, 'queue_name')
+
+        if not queue_name:
+            msg = "queue_name Parameter Missing"
+            return self.send_response(Success=result, Message=msg)
+
+        msg = "Failure"
+        if self._rest_inbound_socket.callcenter_remove_all_tiers_from_queue(queue_name):
+            if self._rest_inbound_socket.callcenter_reload_queue(queue_name):
+                result = True
+                msg = "Success"
+
+        return self.send_response(Success=result, Message=msg)
+
+    @auth_protect
     def testurl(self):
+        queue_name = get_post_param(request, 'queue_name')
         # agent_name = get_post_param(request, 'agent_name')
-        response = self._rest_inbound_socket.callcenter_remove_all_tiers_from_queue("1:=:28:=:soporte")
+        queue_name = '1:=:999:=:ventas_c1'
+        response = self._rest_inbound_socket.callcenter_remove_all_tiers_from_queue(queue_name)
         self._rest_inbound_socket.log.info("resut: {}".format(response))
-        response = self._rest_inbound_socket.callcenter_reload_queue("1:=:28:=:soporte")
+        response = self._rest_inbound_socket.callcenter_reload_queue(queue_name)
         self._rest_inbound_socket.log.info("resut: {}".format(response))
         # lines = response._raw_body.split('\n')
         # if len(lines)
