@@ -2077,20 +2077,27 @@ class Callcenter(Element):
     def execute(self, outbound_socket):
         outbound_socket.log.info("Callcenter: Queue: {}".format(self.queue_name))
         outbound_socket.callcenter(self.queue_name)
-        # waiting event
-        for x in range(10000):
-            event = outbound_socket.wait_for_action(timeout=30, raise_on_hangup=True)
-            if event.is_empty():
-                continue
-            elif event['Event-Name'] == 'CHANNEL_BRIDGE':
-                outbound_socket.log.info("Callcenter channel bridged")
-                continue
-            elif event['Event-Name'] == 'CHANNEL_UNBRIDGE':
-                outbound_socket.log.info("Callcenter channel unbridged")
-                continue
-            elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE':
-                outbound_socket.log.info("Callcenter completed %s" % str(event))
-                continue
-            else:
-                outbound_socket.log.debug("Event Name: {}".format(event['Event-Name']))
-                continue
+        try:
+            # waiting event
+            for x in range(10000):
+                event = outbound_socket.wait_for_action(timeout=30, raise_on_hangup=True)
+                if event.is_empty():
+                    continue
+                elif event['Event-Name'] == 'CHANNEL_BRIDGE':
+                    outbound_socket.log.info("Callcenter channel bridged")
+                    continue
+                elif event['Event-Name'] == 'CHANNEL_UNBRIDGE':
+                    outbound_socket.log.info("Callcenter channel unbridged")
+                    continue
+                elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE':
+                    outbound_socket.log.info("Callcenter completed %s" % str(event))
+                    if event['variable_cc_cancel_reason'] == 'TIMEOUT':
+                        break
+                    continue
+                else:
+                    outbound_socket.log.debug("Event Name: {}".format(event['Event-Name']))
+                    continue
+        except Exception as e:
+            pass
+        finally:
+            pass
