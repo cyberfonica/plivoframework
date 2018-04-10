@@ -1038,6 +1038,24 @@ class RESTInboundSocket(InboundEventSocket):
         lines = response._raw_body.split('\n')
         return lines[0] == '+OK'
 
+    def callcenter_queue_agents_list(self, queue_name):
+        response = self.api("callcenter_config queue list agents {}".format(queue_name))
+        lines = response._raw_body.split('\n')
+        agents = []
+        if lines[0] == '+OK':
+            #no agents in this queue
+            pass
+        else:
+            for raw_agent in lines[1:-2]:
+                fields = raw_agent.split("|")
+                agents.append({
+                    "name": fields[0],
+                    "status": fields[5],
+                    "state": fields[6],
+                })
+
+        return agents
+
     def _get_displace_media_list(self, uuid=''):
         if not uuid:
             return []

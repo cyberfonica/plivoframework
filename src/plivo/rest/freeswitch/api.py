@@ -2278,24 +2278,19 @@ class PlivoRestApi(object):
         return self.send_response(Success=result, Message=msg)
 
     @auth_protect
-    def testurl(self):
+    def callcenter_queue_agents_list(self):
         queue_name = get_post_param(request, 'queue_name')
-        # agent_name = get_post_param(request, 'agent_name')
-        queue_name = '1:=:999:=:ventas_c1'
-        response = self._rest_inbound_socket.callcenter_remove_all_tiers_from_queue(queue_name)
-        self._rest_inbound_socket.log.info("resut: {}".format(response))
-        response = self._rest_inbound_socket.callcenter_reload_queue(queue_name)
-        self._rest_inbound_socket.log.info("resut: {}".format(response))
-        # lines = response._raw_body.split('\n')
-        # if len(lines)
-        # if lines[0] == '+OK':
-            #no tiers in this queue
-            # pass
-        # else:
-        #     for raw_tier in lines[1:-2]:
-        #         match = re.match(r'^(.+?)\|(.+?)\|(.+?)\|(.+?)\|(.+?)$', raw_tier)
-        #         queue_name = match.group(1)
-        #         agent_name = match.group(2)
+        agents = self._rest_inbound_socket.callcenter_queue_agents_list(queue_name)
         result = True
         msg = "Executed"
-        return self.send_response(Success=result, Message=msg)
+        return self.send_response(Success=result, Message=msg, agents=agents)
+
+    @auth_protect
+    def testurl(self):
+        # queue_name = get_post_param(request, 'queue_name')
+        # agent_name = get_post_param(request, 'agent_name')
+        queue_name = '1:=:28:=:soporte'
+        agents = self._rest_inbound_socket.callcenter_queue_agents_list(queue_name)
+        result = True
+        msg = "Executed"
+        return self.send_response(Success=result, Message=msg, agents=agents)
