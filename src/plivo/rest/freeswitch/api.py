@@ -2235,20 +2235,12 @@ class PlivoRestApi(object):
     def callcenter_set_agent_status(self):
         agent_name = get_post_param(request, 'agent_name')
         status = get_post_param(request, 'status')
-        if status == 'available':
-            api_status = callcenter_constants.AGENT_STATUS_AVAILABLE
-        elif status == 'logged_out':
-            api_status = callcenter_constants.AGENT_STATUS_LOGGED_OUT
-        elif status == 'on_demand':
-            api_status = callcenter_constants.AGENT_STATUS_AVAILABLE_ON_DEMAND
-        elif status == 'on_break':
-            api_status = callcenter_constants.AGENT_STATUS_ON_BREAK
-        else:
+        if status not in callcenter_constants.AGENTS_STATUSES:
             msg = "Invalid status received: {}".format(status)
             result = False
             return self.send_response(Success=result, Message=msg)
 
-        if self._rest_inbound_socket.callcenter_config_agent(agent_name, 'status', api_status):
+        if self._rest_inbound_socket.callcenter_config_agent(agent_name, 'status', status):
             msg = "callcenter set agent status executed"
             result = True
         else:
