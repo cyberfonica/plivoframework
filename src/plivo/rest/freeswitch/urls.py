@@ -82,6 +82,8 @@ URLS = {
         '/' + PLIVO_VERSION + '/ConferenceListMembers/': (PlivoRestApi.conference_list_members, ['POST']),
         # API to list all conferences with members
         '/' + PLIVO_VERSION + '/ConferenceList/': (PlivoRestApi.conference_list, ['POST']),
+        # API get a representation of ang agents fields from mod_callcenter
+        '/' + PLIVO_VERSION + '/CallcenterGetAgentData/': (PlivoRestApi.callcenter_get_agent_data, ['POST']),
         # API change a callcenter agent's status
         '/' + PLIVO_VERSION + '/CallcenterSetAgentStatus/': (PlivoRestApi.callcenter_set_agent_status, ['POST']),
         # API deep reload a callcenter queue

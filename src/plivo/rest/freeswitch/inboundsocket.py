@@ -1009,6 +1009,40 @@ class RESTInboundSocket(InboundEventSocket):
             return False
         return True
 
+    def callcenter_get_agent_data(self, agent_name):
+        response = self.api("callcenter_config agent list {}".format(agent_name))
+        lines = response._raw_body.split('\n')
+
+        data = None
+        if lines[0] == '+OK':
+            #no agents in this queue
+            pass
+        else:
+            fields = lines[1].split("|")
+            data = {
+                'name': fields[0],
+                'system': fields[1],
+                'uuid': fields[2],
+                'type': fields[3],
+                'contact': fields[4],
+                'status': fields[5],
+                'state': fields[6],
+                'max_no_answer': fields[7],
+                'wrap_up_time': fields[8],
+                'reject_delay_time': fields[9],
+                'busy_delay_time': fields[10],
+                'no_answer_delay_time': fields[11],
+                'last_bridge_start': fields[12],
+                'last_bridge_end': fields[13],
+                'last_offered_call': fields[14],
+                'last_status_change': fields[15],
+                'no_answer_count': fields[16],
+                'calls_answered': fields[17],
+                'talk_time': fields[18],
+                'ready_time': fields[19],
+            }
+        return data
+
     def callcenter_config_agent(self, agent_name, key, value):
         self.log.info("executing mod_callcenter config agent: name: {}, key: {}, value: {}".format(agent_name, key, value))
         response = self.api("callcenter_config agent set {} {} '{}'".format(key, agent_name, value))

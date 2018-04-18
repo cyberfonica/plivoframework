@@ -2231,6 +2231,23 @@ class PlivoRestApi(object):
         result = True
         return self.send_response(Success=result, Message=msg)
 
+
+    @auth_protect
+    def callcenter_get_agent_data(self):
+        agent_name = get_post_param(request, 'agent_name')
+
+        agent = self._rest_inbound_socket.callcenter_get_agent_data(agent_name)
+
+        if agent:
+            msg = "callcenter get agent data executed"
+            result = True
+        else:
+            msg = "callcenter get agent data status failed. Agent not found"
+            result = False
+
+        return self.send_response(Success=result, Message=msg, agent=agent)
+
+
     @auth_protect
     def callcenter_set_agent_status(self):
         agent_name = get_post_param(request, 'agent_name')
