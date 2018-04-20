@@ -2091,7 +2091,7 @@ class Callcenter(Element):
                     continue
                 elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE':
                     outbound_socket.log.info("Callcenter completed %s" % str(event))
-                    if event['variable_cc_cancel_reason'] == 'TIMEOUT':
+                    if event['variable_cc_cancel_reason'] in ('TIMEOUT', 'NO_AGENT_TIMEOUT'):
                         break
                     continue
                 else:
