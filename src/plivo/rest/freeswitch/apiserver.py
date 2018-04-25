@@ -322,8 +322,6 @@ class PlivoRestServer(PlivoRestApi):
                     self.log.info("Trying to connect to FreeSWITCH at: %s" \
                                             % self.fs_inbound_address)
                     self._rest_inbound_socket.connect()
-                    # reset retries when connection is a success
-                    retries = 1
                     self.log.info("Connected to FreeSWITCH")
                     # serve forever
                     self._rest_inbound_socket.serve_forever()
@@ -331,13 +329,8 @@ class PlivoRestServer(PlivoRestApi):
                     if self._run is False:
                         break
                     self.log.error("Connect failed: %s" % str(e))
-                # sleep after connection failure
-                sleep_for = retries * 10
-                self.log.error("Reconnecting in %d seconds" % sleep_for)
-                gevent.sleep(sleep_for)
-                # don't sleep more than 30 secs
-                if retries < 3:
-                    retries += 1
+                    # If we cannot connect to FS, we die. Let docker handle restarting the process. 
+                    sys.exit(1)
         except (SystemExit, KeyboardInterrupt):
             pass
         # kill http server
