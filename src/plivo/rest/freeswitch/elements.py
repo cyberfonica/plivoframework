@@ -2076,6 +2076,7 @@ class Callcenter(Element):
 
     def execute(self, outbound_socket):
         outbound_socket.log.info("Callcenter: Queue: {}".format(self.queue_name))
+        outbound_socket.set("RECORD_STEREO=true")
         outbound_socket.callcenter(self.queue_name)
         try:
             # waiting event
