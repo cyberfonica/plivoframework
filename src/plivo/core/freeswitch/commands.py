@@ -290,6 +290,14 @@ class Commands(object):
         """
         return self._protocol_sendmsg("set", args, uuid, lock)
 
+    def export(self, args, uuid="", lock=True):
+        """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_export
+        #> export("x-uuid=${uuid}")
+
+        For Inbound connection, uuid argument is mandatory.
+        """
+        return self._protocol_sendmsg("export", args, uuid, lock)
+
     def set_global(self, args, uuid="", lock=True):
         """Please refer to http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_set_global
 

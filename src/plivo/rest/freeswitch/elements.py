@@ -828,11 +828,6 @@ class Dial(Element):
         # Don't hangup after bridge !
         outbound_socket.set("hangup_after_bridge=false")
 
-        # Enviamos en la cabecera SIP INVITE y OK (de respuesta), el Call-UUID empleado por Freeswitch.
-        # Nota: Usado por el telefono web para ejecutar acciones en Plivo REST.
-        outbound_socket.set("sip_h_X-Fs-Uuid=%s" % outbound_socket.get_channel_unique_id())
-        outbound_socket.set("sip_rh_X-Fs-Uuid=%s" % outbound_socket.get_channel_unique_id())
-
         # Set ring flag if dial will ring.
         # But first set plivo_dial_rang to false
         # to be sure we don't get it from an old Dial
@@ -896,11 +891,7 @@ class Dial(Element):
                 self.record_call_path, datetime.now().strftime("%Y%m%d-%H%M%S"),
                 outbound_socket.get_channel_unique_id()
             )
-            # En outbound_socket no disponemos de la aplicación 'export', por eso usamos 'set',
-            # para activar la grabación una vez sea contastada la llamada, hemos de exportar a
-            # al resto de patas 'execute_on_answer'.
-            outbound_socket.set("execute_on_answer=record_session %s" % record_file)
-            outbound_socket.set("export_vars=execute_on_answer")
+            outbound_socket.export("execute_on_answer=record_session %s" % record_file)
             outbound_socket.log.info("Record Execute On Answer")
 
         # Play Dial music or bridge the early media accordingly
@@ -2077,6 +2068,7 @@ class Callcenter(Element):
     def execute(self, outbound_socket):
         outbound_socket.log.info("Callcenter: Queue: {}".format(self.queue_name))
         outbound_socket.set("RECORD_STEREO=true")
+        outbound_socket.set("cc_export_vars=sip_h_X-Fs-Uuid,sip_rh_X-Fs-Uuid")
         outbound_socket.callcenter(self.queue_name)
         try:
             # waiting event

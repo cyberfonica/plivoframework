@@ -354,6 +354,12 @@ class PlivoOutboundEventSocket(OutboundEventSocket):
         self.session_params['CallUUID'] = self.call_uuid
         # Set Direction to Session Params
         self.session_params['Direction'] = channel.get_header('Call-Direction')
+
+        # Enviamos en la cabecera SIP INVITE y OK (de respuesta), el Call-UUID empleado por Freeswitch.
+        # Nota: Usado por el telefono web para ejecutar acciones en Plivo REST.
+        self.export("sip_h_X-Fs-Uuid=%s" % self.call_uuid)
+        self.export("sip_rh_X-Fs-Uuid=%s" % self.call_uuid)
+
         aleg_uuid = ''
         aleg_request_uuid = ''
         forwarded_from = get_substring(':', '@',
