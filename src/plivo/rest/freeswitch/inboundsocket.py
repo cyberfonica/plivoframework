@@ -1068,9 +1068,8 @@ class RESTInboundSocket(InboundEventSocket):
         return True
 
     def callcenter_reload_queue(self, queue_name):
-        response = self.api("callcenter_config queue reload {}".format(queue_name))
-        lines = response._raw_body.split('\n')
-        return lines[0] == '+OK'
+        response = self.bgapi("callcenter_config queue reload {}".format(queue_name))
+        return response.is_success()
 
     def callcenter_queue_agents_list(self, queue_name):
         response = self.api("callcenter_config queue list agents {}".format(queue_name))

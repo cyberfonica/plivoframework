@@ -2270,6 +2270,7 @@ class PlivoRestApi(object):
         """
         deep reload means that it will remove all of the queue's tiers before reloading
         the config
+        This method work asynchronously
         """
         result = False
         queue_name = get_post_param(request, 'queue_name')
@@ -2278,11 +2279,11 @@ class PlivoRestApi(object):
             msg = "queue_name Parameter Missing"
             return self.send_response(Success=result, Message=msg)
 
-        msg = "Failure"
+        msg = "Failure to reload queue: {}".format(queue_name)
         if self._rest_inbound_socket.callcenter_remove_all_tiers_from_queue(queue_name):
             if self._rest_inbound_socket.callcenter_reload_queue(queue_name):
                 result = True
-                msg = "Success"
+                msg = "queue: {} deeply reloaded".format(queue_name)
 
         return self.send_response(Success=result, Message=msg)
 
