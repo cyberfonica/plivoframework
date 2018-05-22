@@ -2266,6 +2266,25 @@ class PlivoRestApi(object):
         return self.send_response(Success=result, Message=msg)
 
     @auth_protect
+    def callcenter_reload_queue(self):
+        """
+        This method work asynchronously
+        """
+        result = False
+        queue_name = get_post_param(request, 'queue_name')
+
+        if not queue_name:
+            msg = "queue_name Parameter Missing"
+            return self.send_response(Success=result, Message=msg)
+
+        msg = "Failure to reload queue: {}".format(queue_name)
+        if self._rest_inbound_socket.callcenter_reload_queue(queue_name):
+            result = True
+            msg = "queue: {} reloaded".format(queue_name)
+
+        return self.send_response(Success=result, Message=msg)
+
+    @auth_protect
     def callcenter_deep_reload_queue(self):
         """
         deep reload means that it will remove all of the queue's tiers before reloading

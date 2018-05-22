@@ -86,6 +86,8 @@ URLS = {
         '/' + PLIVO_VERSION + '/CallcenterGetAgentData/': (PlivoRestApi.callcenter_get_agent_data, ['POST']),
         # API change a callcenter agent's status
         '/' + PLIVO_VERSION + '/CallcenterSetAgentStatus/': (PlivoRestApi.callcenter_set_agent_status, ['POST']),
+        # API reload a callcenter queue
+        '/' + PLIVO_VERSION + '/CallcenterReloadQueue/': (PlivoRestApi.callcenter_reload_queue, ['POST']),
         # API deep reload a callcenter queue
         '/' + PLIVO_VERSION + '/CallcenterDeepReloadQueue/': (PlivoRestApi.callcenter_deep_reload_queue, ['POST']),
         # API get a list of agents of a callcenter queue
