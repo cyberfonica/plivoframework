@@ -109,6 +109,8 @@ case $1 in
 
     "rest")
         replace_default_vars
+        echo "Will sleep 15 seconds to allow FS some time to start"
+        sleep 15
         exec "/opt/plivo/src/plivo-rest" "-c" "/etc/plivo/default.conf"
         ;;
 
