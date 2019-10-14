@@ -65,7 +65,8 @@ ELEMENTS_DEFAULT_PARAMS = {
                 'callbackUrl': '',
                 'callbackMethod': 'POST',
                 'digitsMatch': '',
-                'recordCallPath': None
+                'recordCallPath': None,
+                'trackAgent': None,
         },
         'GetDigits': {
                 #action: DYNAMIC! MUST BE SET IN METHOD,
@@ -617,6 +618,7 @@ class Dial(Element):
     callbackMethod: submit to 'callbackUrl' url using GET or POST
     recordCallPath: complete file path to save the file to (record call when called party answered)
                     (default=None)
+    trackAgent: Id of the agent we want to run the callcenter_track on. The caller. (default None)
     """
     DEFAULT_TIMELIMIT = 14400
 
@@ -672,6 +674,7 @@ class Dial(Element):
             raise RESTAttributeException("callbackMethod must be 'GET' or 'POST'")
         self.digits_match = self.extract_attribute_value("digitsMatch")
         self.record_call_path = self.extract_attribute_value("recordCallPath")
+        self.track_agent = self.extract_attribute_value("trackAgent")
 
     def _prepare_play_string(self, outbound_socket, remote_url):
         sound_files = []
@@ -923,6 +926,10 @@ class Dial(Element):
             outbound_socket.set("instant_ringback=false")
             outbound_socket.set("ignore_early_media=true")
             outbound_socket.unset("ringback")
+
+        if self.track_agent is not None:
+            outbound_socket.log.info("Tracking agent %s" % self.track_agent)
+            outbound_socket.callcenter_track(self.track_agent)
 
         # Start dial
         bleg_uuid = ''

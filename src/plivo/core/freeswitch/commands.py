@@ -571,3 +571,12 @@ class Commands(object):
         For Inbound connection, uuid argument is mandatory.
         """
         return self._protocol_sendmsg("callcenter", queue_name, uuid, lock)
+
+    def callcenter_track(self, agent_name, uuid="", lock=True):
+        """
+        Please refer to https://freeswitch.org/confluence/display/FREESWITCH/mod_callcenter
+        also to https://freeswitch.org/jira/browse/FS-9609
+
+        For Inbound connection, uuid argument is mandatory.
+        """
+        return self._protocol_sendmsg("callcenter_track", agent_name, uuid, lock)
