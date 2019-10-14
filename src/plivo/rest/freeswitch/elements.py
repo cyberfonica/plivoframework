@@ -928,7 +928,7 @@ class Dial(Element):
             outbound_socket.unset("ringback")
 
         if self.track_agent is not None:
-            outbound_socket.log.info("Tracking agent %s" % self.track_agent)
+            outbound_socket.log.info("Callcenter tracking dialing agent %s" % self.track_agent)
             outbound_socket.callcenter_track(self.track_agent)
 
         # Start dial
