@@ -929,7 +929,7 @@ class Dial(Element):
 
         if self.track_agent is not None:
             outbound_socket.log.info("Callcenter tracking dialing agent %s" % self.track_agent)
-            outbound_socket.set('execute_on_answer_2=callcenter_track {}'.format(self.track_agent))
+            outbound_socket.set('execute_on_ring=callcenter_track {}'.format(self.track_agent))
 
         # Start dial
         bleg_uuid = ''
