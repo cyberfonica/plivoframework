@@ -2315,11 +2315,15 @@ class PlivoRestApi(object):
         return self.send_response(Success=result, Message=msg, agents=agents)
 
     @auth_protect
-    def testurl(self):
-        # queue_name = get_post_param(request, 'queue_name')
-        # agent_name = get_post_param(request, 'agent_name')
-        queue_name = '1:=:28:=:soporte'
-        agents = self._rest_inbound_socket.callcenter_queue_agents_list(queue_name)
+    def callcenter_members_list(self):
+        members = self._rest_inbound_socket.callcenter_get_members()
         result = True
         msg = "Executed"
-        return self.send_response(Success=result, Message=msg, agents=agents)
+        return self.send_response(Success=result, Message=msg, members=members)
+
+    @auth_protect
+    def testurl(self):
+        members = self._rest_inbound_socket.callcenter_get_members()
+        result = True
+        msg = "Executed"
+        return self.send_response(Success=result, Message=msg, agents=members)

@@ -92,6 +92,8 @@ URLS = {
         '/' + PLIVO_VERSION + '/CallcenterDeepReloadQueue/': (PlivoRestApi.callcenter_deep_reload_queue, ['POST']),
         # API get a list of agents of a callcenter queue
         '/' + PLIVO_VERSION + '/CallcenterQueueAgentsList/': (PlivoRestApi.callcenter_queue_agents_list, ['POST']),
+        # API get a list of members in all queues
+        '/' + PLIVO_VERSION + '/CallcenterMembersList/': (PlivoRestApi.callcenter_members_list, ['POST']),
         # TESTURL
         '/' + PLIVO_VERSION + '/testurl/': (PlivoRestApi.testurl, ['POST']),
        }

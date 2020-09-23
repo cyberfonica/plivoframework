@@ -1089,6 +1089,38 @@ class RESTInboundSocket(InboundEventSocket):
 
         return agents
 
+    def callcenter_get_members(self):
+        response = self.api("callcenter_config queue list members")
+        lines = response._raw_body.split('\n')
+
+        data = []
+        if lines[0] == '+OK':
+            #no members in any queue
+            pass
+        else:
+            for line in lines[1:-2]:
+                fields = line.split("|")
+                data.append({
+                    'queue': fields[0],
+                    'instance_id': fields[1],
+                    'uuid': fields[2],
+                    'session_uuid': fields[3],
+                    'cid_number': fields[4],
+                    'cid_name': fields[5],
+                    'system_epoch': fields[6],
+                    'joined_epoch': fields[7],
+                    'rejoined_epoch': fields[8],
+                    'bridge_epoch': fields[9],
+                    'abandoned_epoch': fields[10],
+                    'base_score': fields[11],
+                    'skill_score': fields[12],
+                    'serving_agent': fields[13],
+                    'serving_system': fields[14],
+                    'state': fields[15],
+                    'score': fields[16],
+                })
+        return data
+
     def _get_displace_media_list(self, uuid=''):
         if not uuid:
             return []
