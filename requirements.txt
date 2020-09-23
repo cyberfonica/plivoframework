@@ -1,11 +1,11 @@
 Click==7.0
-Cython==0.20.1post0
+Cython==0.20.1
 Flask==0.12.2
 Jinja2==2.10.3
 MarkupSafe==1.1.1
 Werkzeug==0.16.0
 argparse==1.2.1
-chardet==2.0.1
+chardet==2.1.1
 colorama==0.2.5
 https://github.com/gevent/gevent/archive/1.0a3.tar.gz
 greenlet==0.4.15
