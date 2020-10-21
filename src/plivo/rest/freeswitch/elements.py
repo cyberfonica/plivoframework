@@ -977,7 +977,7 @@ class Dial(Element):
                         outbound_socket.log.info("Dial unbridged")
                         break
                 elif event['Event-Name'] == 'CHANNEL_EXECUTE_COMPLETE' \
-                        and event['variable_current_application'] == 'bridge':
+                        and event['Application'] == 'bridge':
                     outbound_socket.log.info("Dial completed %s" % str(event))
                     break
 
