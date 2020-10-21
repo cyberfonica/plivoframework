@@ -561,6 +561,8 @@ class PlivoOutboundEventSocket(OutboundEventSocket):
         self.log.info("Fetching RESTXML from %s" % self.target_url)
         self.xml_response = self.send_to_url(self.target_url, params, method)
         self.log.info("Requested RESTXML to %s" % self.target_url)
+        self.log.debug(str(self.xml_response))
+
 
     def send_to_url(self, url=None, params={}, method=None):
         """
